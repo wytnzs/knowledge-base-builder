@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "description": "这个库存什么、给谁用",
+  "database": "data.db",
+  "tables": [
+    {
+      "name": "records",
+      "description": "一条记录是什么（一个判例 / 一个产品 / 一个客户 / 一份资料）",
+      "primary_key": "id",
+      "fields": [
+        {"name": "id", "type": "text", "description": "唯一标识；用自然键或自增", "required": true},
+        {"name": "title", "type": "text", "description": "标题", "required": true},
+        {"name": "summary", "type": "text", "description": "压缩后的一句话", "required": false},
+        {"name": "source_path", "type": "text", "description": "原文路径", "required": true}
+      ],
+      "indexes": ["title"]
+    }
+  ]
+}
