@@ -6,7 +6,7 @@ description: >
   触发：我想建个知识库、帮我搭一个知识库、知识库怎么建、知识库怎么用、
   我要把库拆开/换结构、建完要装日常模块。
   日常动作交给配套模块，不在这里做：收件→inbox-triage、铸卡→knowledge-card、
-  主题→theme-map、项目→project-ops、复盘→area-review、改标准→me-update、
+  主题→theme-map、项目→project-ops、复盘→area-review、标准变了→me-update、
   外部数据→data-warehouse、体检→kb-health。
   NOT FOR：写内容（另走内容管线）。
 version: 1.4.0
