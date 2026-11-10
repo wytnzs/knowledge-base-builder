@@ -9,7 +9,7 @@ description: >
   主题→theme-map、项目→project-ops、复盘→area-review、标准变了→me-update、
   外部数据→data-warehouse、体检→kb-health。
   NOT FOR：写内容（另走内容管线）。
-version: 1.4.0
+version: 1.4.1
 ---
 
 # 知识库原技能

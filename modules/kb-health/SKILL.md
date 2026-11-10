@@ -38,6 +38,8 @@ python {{SKILL_ROOT}}/scripts/check_kb.py --root "{{ROOT}}" --stage 9
 
 ## 下一步（只建议，不执行）
 
+**停在这里。** 下面只是建议，操作者明确说做才继续。
+
 - 如果入口堵，可以问操作者要不要用 `inbox-triage`；
 - 如果结构要重建，可以问要不要用 `knowledge-base-builder`；
 - 只修最堵的一项，修完停下，不自动往下跑。
