@@ -29,7 +29,7 @@
 | `knowledge-card` | 03-Knowledge | 装 |
 | `project-ops` | 01-Projects | 装 |
 | `kb-health` | 跨层 | 装 |
-| `area-review` | 02-Areas | 按需 |
+| `area-review` | 02-Areas | 装 |
 | `theme-map` | 03-Knowledge | 按需 |
 | `me-update` | 05-Me | 按需 |
 | `data-warehouse` | 外部数据 | 按需 |
@@ -86,7 +86,7 @@ knowledge-base-builder/
 
 ## 版本
 
-v1.4.0
+v1.5.0
 
 ## License
 

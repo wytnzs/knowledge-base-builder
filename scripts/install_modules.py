@@ -23,7 +23,7 @@ MODULES = {
     "knowledge-card": ("03-Knowledge", True),
     "project-ops": ("01-Projects", True),
     "kb-health": ("跨层", True),
-    "area-review": ("02-Areas", False),
+    "area-review": ("02-Areas", True),
     "theme-map": ("03-Knowledge", False),
     "me-update": ("05-Me", False),
     "data-warehouse": ("外部数据", False),
@@ -68,7 +68,7 @@ def main():
         print("-" * 52)
         for name, (layer, default) in MODULES.items():
             print(f"{name:<28}{layer:<14}{'是' if default else '按需'}")
-        print("\n默认四件套：" + "、".join(DEFAULTS))
+        print("\n默认五件套：" + "、".join(DEFAULTS))
         return 0
 
     if not args.target:

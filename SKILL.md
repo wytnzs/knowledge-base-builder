@@ -9,7 +9,7 @@ description: >
   主题→theme-map、项目→project-ops、复盘→area-review、标准变了→me-update、
   外部数据→data-warehouse、体检→kb-health。
   NOT FOR：写内容（另走内容管线）。
-version: 1.4.1
+version: 1.5.0
 ---
 
 # 知识库原技能
@@ -37,7 +37,7 @@ version: 1.4.1
 
 第一版的默认骨架是 `00-Inbox` / `01-Projects` / `02-Areas` / `03-Knowledge` / `04-Archive` / `05-Me`；没有长期方向就先不建 `02-Areas`。
 
-**第一版交付后，装默认四件套**（收件分流、铸卡、项目推进、体检），跑一遍最小管线；复盘、主题、我这一层三个模块按需装。见 `references/模块安装.md`，用 `scripts/install_modules.py` 装。
+**第一版交付后，装默认五件套**（收件分流、铸卡、项目推进、复盘、体检），跑一遍最小管线；主题、我这一层、外部数据三个模块按需装。见 `references/模块安装.md`，用 `scripts/install_modules.py` 装。
 
 第一版只要满足三条就算立住：能放进一份真材料、能找回来、能产出一个他真拿去用的东西。
 

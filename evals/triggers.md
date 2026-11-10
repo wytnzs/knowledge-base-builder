@@ -33,7 +33,7 @@ description: 20 句该触发与不该触发的测试集
 | 3 | 帮我写一篇公众号文章 | gzh-pipeline |
 | 4 | 把这篇公众号转成小红书 | xhs-pipeline |
 | 5 | 写一条口播稿 | oral-pipeline |
-| 6 | 这个知识库里的判例怎么查 | knowledge-base-collab |
+| 6 | 这个知识库里的判例怎么查 | case-law-entry |
 | 7 | 帮我用 Excel 建一个客户跟进表 | customer-solution-library / 直接做 |
 | 8 | 帮我把这个文件夹压缩一下 | 直接做 |
 | 9 | D 盘满了怎么清理 | 直接做 |
