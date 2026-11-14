@@ -1,0 +1,57 @@
+interface:
+  display_name: "知识库原技能 · 基座"
+  short_description: "从零建起自己的知识库，建库当天跑通第一条工作回路；跨 Claude Code / Codex / WorkBuddy"
+  default_prompt: >-
+    Use $knowledge-base-builder to build a personal knowledge base and get it used in real work, not just create folders.
+    Ask three things first: what materials they have, what they want the base to accomplish, and which recurring task they do every week.
+    Detect the agent they use (Claude Code, Codex, WorkBuddy, generic chat) before choosing the rules file and module install mode.
+    Build the six roles, then write the five root files: README.md, AGENTS.md (canonical rules; CLAUDE.md or AI协作规则.md as adapters),
+    .kb-base.json, 写入规则.md, 工作回路.md, plus 采用记录.md. In the same conversation, run the first work loop with real materials,
+    produce a real deliverable, write back at least one item, and log it. Never write rules only into CLAUDE.md; never stop at
+    "the skeleton is done". Do not fabricate materials, results, or client data. Do not delete, overwrite, or migrate existing files
+    without a list and explicit confirmation.
+  examples:
+    - "我想建个知识库，但不知道从哪下手"
+    - "我建了知识库，但平时根本想不起来用"
+    - "我主要用 WorkBuddy，不用 Claude Code，这套能用吗"
+    - "帮我把这个库接进每周写稿的流程"
+    - "我的库建了半年，东西不少，但每次干活还是从头找"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "claude"
+    - "openai"
+    - "generic"
+    - "agent-skills-compatible"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow read-only source review"
+    generated_public_claims: "evidence-bound"
+  permissions:
+    network: "none required"
+    file_write: "new knowledge base files under the user's chosen root; never overwrite existing files without a list and confirmation"
+    subprocess: "python scripts for structure check and module install; no publishing"
+    interactive: "ask about agent, materials, recurring task, and agent rules file before writing"
+  degradation:
+    claude: "canonical-source"
+    generic: "neutral-source"
+    agent-skills-compatible: "canonical-source"
+gates:
+  scaffold:
+    - "SKILL.md frontmatter"
+    - "clear triggers and exclusions"
+    - "README"
+  production:
+    - "agent detected"
+    - "first work loop run with real materials"
+    - "five root files and adoption log"
+    - "check_kb --profile base and use"
+    - "module install mode matches agent"
+    - "no fabricated materials or results"

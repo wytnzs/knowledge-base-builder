@@ -1,0 +1,119 @@
+{
+  "name": "knowledge-base-builder",
+  "version": "2.1.0",
+  "owner": "王永涛",
+  "updated_at": "2026-11-14",
+  "status": "active",
+  "maturity_tier": "library",
+  "lifecycle_stage": "production",
+  "context_budget_tier": "production",
+  "review_cadence": "quarterly",
+  "target_platforms": [
+    "claude",
+    "openai",
+    "generic",
+    "agent-skills-compatible"
+  ],
+  "factory_components": [
+    "references",
+    "templates",
+    "modules",
+    "scripts",
+    "evals",
+    "reports"
+  ],
+  "release_gates": [
+    "prior_art_research",
+    "generalization_gate",
+    "action_boundary",
+    "root_entrypoint_isolation",
+    "validate_skill",
+    "trigger_eval",
+    "readme_product_page",
+    "first_work_loop_evidence"
+  ],
+  "source_of_truth": "https://github.com/wytnzs/knowledge-base-builder",
+  "upstream_inspiration": "",
+  "changelog": [
+    {
+      "version": "2.1.0",
+      "date": "2026-11-14",
+      "why": "用户要求给 wechat-cli 加朋友圈识别，并把适配器放进 skill 库：先探测、先同意、按需安装；不同意就不扫微信。",
+      "changed": [
+        "新增 references/微信适配.md：同意、能力矩阵、安装、隐私、回退、合规",
+        "新增 scripts/discover_person.py：扫工作区/已有 skill/项目页/数据目录（只读元数据）",
+        "新增 scripts/wechat_probe.py：检测 wechat-cli / wx / chatlog-plus、sns.db 密钥、聊天/朋友圈能力",
+        "新增 scripts/wechat_install.py：按需安装 wechat-cli 或 wechat-cli+moments 补丁；--yes 才执行",
+        "新增 tools/wechat/patches/wechat-cli-moments.patch：给 wechat-cli 加 moments feed/search（Apache-2.0 上游 + MIT 解析逻辑署名）",
+        "新增 templates/现状扫描.md、工作数据技能表.md、私人来源清单.md",
+        "SKILL/建库流程 加 P0.5 了解你；协作路由、访谈问题库同步",
+        "kb-base.json 加 private_sources",
+        "checklist/evals 加同意与只读检查"
+      ],
+      "evidence": [
+        "wechat-cli 补丁在 Windows 本机跑通 moments feed/search（13,685 条，13,679 解析成功）",
+        "补丁在固定 commit a378923 上 git apply --check 通过",
+        "probe 检测到 3 个微信账号目录、sns.db 密钥、chatlog-plus 运行中"
+      ]
+    },
+    {
+      "version": "2.0.1",
+      "date": "2026-11-14",
+      "why": "用户明确不要「7 天」这类验证窗口：准备好真实材料就开始跑，跑完为止，能一天更好；之后持续用、持续优化 skill。",
+      "changed": [
+        "删除 7 天采用协议和第 7 天复盘；改成「准备真材料，跑到跑通为止」+「每次真事发生就跑」+「每跑 3 次看一次断点」",
+        "30 天计划改名为「采用计划」，按第一次 / 之后每次 / 每 3 次组织，不按周",
+        "任务选取去掉「最近两周 / 30 天内」口径，改成「最近真会发生」",
+        "采用记录增加「skill / 模块改动候选」；同一处卡 3 次以上再改 skill",
+        "体检 v0 从「30天计划」改为「采用计划」，仍十二项",
+        "同步 SKILL、流程、模板、使用说明、evals、tests"
+      ],
+      "evidence": [
+        "validate 0/0",
+        "trigger 30/30",
+        "tests 7 项通过",
+        "两种 Agent 模式 + base/use/v0 全过"
+      ]
+    },
+    {
+      "version": "2.0.0",
+      "date": "2026-11-14",
+      "why": "用户指出两点：这个 skill 不能只装到 Claude Code，WorkBuddy、Codex 也要能用；更要紧的是，建出来的库用不上，核心目的没达到。v1.6.0 只解决了结构和契约，没解决采用路径和跨 Agent。",
+      "changed": [
+        "规则正文从 CLAUDE.md 改为 AGENTS.md；按 Agent 生成 CLAUDE.md / AI协作规则.md / 开场卡",
+        "新增 references/工作回路.md：触发 / 读什么 / 产出什么 / 写回什么 / 按次采用协议 / 断点表",
+        "建库流程从四轮改为五轮：第五轮用真材料跑第一条回路，产出真东西，记采用记录",
+        "新增「用」模式与采用诊断：建了没用起来，不重建，选一条回路用真材料跑到跑通",
+        ".kb-base.json 新增 agent 与 loops；契约升到 2",
+        "模块正文改为 SKILL.template.md；安装分 skills（Claude Code/Codex）和 checklists（WorkBuddy/通用）",
+        "check_kb 新增工作回路、采用记录、Agent 规则检查；新增 --profile use",
+        "新增 references/Agent适配.md：四个 Agent 的规则文件、模块装法、降级方案",
+        "新增 templates/AGENTS.md、工作回路.md、采用记录.md、开场卡.md；采用计划改为采用计划",
+        "按 qiaomu-meta-skill 补 agents/interface.yaml、manifest.json、trigger_cases.json、Skill IR",
+        "新增 references/对话样例.md（两段五轮示范）与 evals/output_cases.json（输出验收）",
+        "工作回路补「跑一条回路的六步固定动作」：读 → 补料 → 产出 → 写回 → 记录 → 收尾"
+      ],
+      "evidence": [
+        "validate_skill.py 0 failures 0 warnings",
+        "trigger_eval.py 30/30",
+        "tests/test_kb_base.py 6 项通过",
+        "Claude Code skills 模式与 WorkBuddy checklists 模式实测；--profile base/use/v0 全过",
+        "清空采用记录后 --profile use 正确报 MISS",
+        "release_check.py --phase local：除 feature_branch 外 pass/warn"
+      ]
+    },
+    {
+      "version": "1.6.0",
+      "date": "2026-11-14",
+      "why": "用户要求把建库 skill 做成基座：结构、规则、目录名散在四处，建出来的库没有身份，也没有给 Agent 的开工协议。",
+      "changed": [
+        "新增基座契约、模块登记表、.kb-base.json、CLAUDE.md 模板",
+        "安装与体检脚本按契约走",
+        "基础架构、建库流程、模块安装、协作路由、evals 同步"
+      ],
+      "evidence": [
+        "临时库五组实测，记录在 01-Projects/知识库原技能/干跑记录-2026-11-14.md"
+      ]
+    }
+  ]
+}

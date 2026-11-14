@@ -1,0 +1,236 @@
+{
+  "recommended_threshold": 0.34,
+  "description_required_concepts": [
+    "knowledge_base",
+    "build_action",
+    "use_action"
+  ],
+  "positive_concepts": {
+    "knowledge_base": [
+      "知识库",
+      "知识管理",
+      "第二大脑",
+      "笔记库",
+      "资料库",
+      "知识资产",
+      "knowledge base",
+      "PKM",
+      "second brain",
+      "文件",
+      "资料",
+      "笔记",
+      "收藏",
+      "截图",
+      "库",
+      "系统",
+      "管理"
+    ],
+    "build_action": [
+      "建",
+      "搭",
+      "搭建",
+      "整理",
+      "重构",
+      "拆",
+      "合并",
+      "骨架",
+      "地基",
+      "结构",
+      "build",
+      "set up",
+      "restructure",
+      "归",
+      "弄"
+    ],
+    "use_action": [
+      "用上",
+      "用起来",
+      "用进",
+      "接入",
+      "干活",
+      "工作",
+      "落地",
+      "想不起来用",
+      "采用",
+      "adoption",
+      "use in work",
+      "找不到",
+      "用的时候",
+      "能用",
+      "记住",
+      "每次",
+      "重复"
+    ],
+    "agent": [
+      "Agent",
+      "AI",
+      "Claude Code",
+      "Codex",
+      "WorkBuddy",
+      "模型",
+      "网页版"
+    ],
+    "module": [
+      "模块",
+      "收件",
+      "铸卡",
+      "复盘",
+      "体检",
+      "skill",
+      "技能",
+      "流程"
+    ]
+  },
+  "negative_patterns": [
+    "写一篇公众号",
+    "公众号文章",
+    "小红书",
+    "口播",
+    "逐字稿",
+    "录入判例",
+    "判例入库",
+    "能不能赔",
+    "健康告知",
+    "解释一下",
+    "翻译",
+    "只要提纲",
+    "头脑风暴",
+    "整理一下 00-Inbox",
+    "处理 Inbox",
+    "做成一张知识卡片",
+    "推荐笔记软件",
+    "压缩文件夹",
+    "清理 D 盘",
+    "压缩",
+    "Python 统计",
+    "Excel",
+    "跟进表",
+    "文件夹"
+  ],
+  "should_trigger": [
+    {
+      "text": "我想建个自己的知识库，但不知道从哪下手",
+      "family": "cn_build"
+    },
+    {
+      "text": "我电脑里文件太乱了，想整理成一套能用的系统",
+      "family": "cn_messy_files"
+    },
+    {
+      "text": "资料存了一堆，用的时候一个都找不到，怎么弄",
+      "family": "cn_cannot_find"
+    },
+    {
+      "text": "帮我搭一个知识库，我是做保险的",
+      "family": "cn_profession"
+    },
+    {
+      "text": "知识库怎么建？有没有什么方法",
+      "family": "cn_method"
+    },
+    {
+      "text": "我的知识库建了半年，基本没用起来，怎么救",
+      "family": "cn_unused"
+    },
+    {
+      "text": "我建了知识库，但平时根本想不起来用",
+      "family": "cn_adoption"
+    },
+    {
+      "text": "怎么让 AI 直接参与我的日常工作，不只是存资料",
+      "family": "cn_work_loop"
+    },
+    {
+      "text": "我用的不是 Claude Code，是 WorkBuddy，这套能用吗",
+      "family": "cn_agent"
+    },
+    {
+      "text": "我想把微信收藏、截图、笔记都归到一起，以后好找",
+      "family": "cn_inbox"
+    },
+    {
+      "text": "给我的工作加一套流程，每周重复的事太多了",
+      "family": "cn_pipeline"
+    },
+    {
+      "text": "我是律师，案子太多，想弄个库管理",
+      "family": "cn_lawyer"
+    },
+    {
+      "text": "怎么让 AI 记住我的情况，不用每次重新说",
+      "family": "cn_identity"
+    },
+    {
+      "text": "帮我给知识库打个底，以后换哪个 AI 都能接着用",
+      "family": "cn_base"
+    },
+    {
+      "text": "我这个库建好了，怎么让别的 Agent 直接上手",
+      "family": "cn_agent_rules"
+    },
+    {
+      "text": "知识库结构要升级，别把我原来的东西弄丢",
+      "family": "cn_upgrade"
+    },
+    {
+      "text": "I want to build a personal knowledge base and actually use it in my work.",
+      "family": "en_build"
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "text": "帮我整理一下 00-Inbox 里的文件",
+      "family": "inbox_existing"
+    },
+    {
+      "text": "把这段经验做成一张知识卡片",
+      "family": "card"
+    },
+    {
+      "text": "帮我写一篇公众号文章",
+      "family": "gzh"
+    },
+    {
+      "text": "把这篇公众号转成小红书",
+      "family": "xhs"
+    },
+    {
+      "text": "写一条口播稿",
+      "family": "oral"
+    },
+    {
+      "text": "这个知识库里的判例怎么查",
+      "family": "case_query"
+    },
+    {
+      "text": "帮我用 Excel 建一个客户跟进表",
+      "family": "spreadsheet"
+    },
+    {
+      "text": "帮我把这个文件夹压缩一下",
+      "family": "compress"
+    },
+    {
+      "text": "D 盘满了怎么清理",
+      "family": "disk"
+    },
+    {
+      "text": "写个 Python 统计一下文件数量",
+      "family": "script"
+    }
+  ],
+  "near_neighbor": [
+    {
+      "text": "帮我把 Obsidian 库同步一下",
+      "family": "sync"
+    },
+    {
+      "text": "推荐几个好用的笔记软件",
+      "family": "tool_recommend"
+    },
+    {
+      "text": "帮我把这个文件夹按类型重命名",
+      "family": "rename"
+    }
+  ]
+}

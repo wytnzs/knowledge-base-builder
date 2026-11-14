@@ -1,0 +1,26 @@
+{
+  "base": "knowledge-base-builder",
+  "version": "2.1.0",
+  "contract": 2,
+  "created": "{{date}}",
+  "updated": "{{date}}",
+  "agent": {
+    "primary": "claude-code",
+    "rules": "AGENTS.md",
+    "adapters": ["CLAUDE.md"],
+    "modules_mode": "skills",
+    "skills_dir": ".claude/skills"
+  },
+  "roles": {
+    "inbox": "{{INBOX}}",
+    "projects": "{{PROJECTS}}",
+    "areas": "{{AREAS}}",
+    "knowledge": "{{KNOWLEDGE}}",
+    "archive": "{{ARCHIVE}}",
+    "me": "{{ME}}"
+  },
+  "modules": [],
+  "loops": [],
+  "private_sources": [],
+  "data_root": "{{DATA_ROOT}}"
+}
