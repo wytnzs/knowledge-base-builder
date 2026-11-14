@@ -14,15 +14,29 @@
 看不出“这个东西对不对”。最终判断仍由人做。
 """
 import argparse
+import json
 import os
 import re
 import sys
 from collections import defaultdict
 
 SKIP_DIRS = {".git", "node_modules", ".obsidian", ".claude", "__pycache__", "_eval", "templates"}
+BASE_FILE = ".kb-base.json"
+SUPPORTED_CONTRACT = 2
 
 FRONTMATTER = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 FIELD_LINE = re.compile(r"^(\w[\w-]*):\s*(.*?)\s*$", re.M)
+
+
+def load_base(root):
+    path = os.path.join(root, BASE_FILE)
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"_error": True}
 
 
 def read_md(path):
@@ -77,8 +91,8 @@ def main():
     ap.add_argument("--root", required=True)
     ap.add_argument("--stage", type=int, default=9, help="当前走到第几阶段（0-9），只看这阶段之前该有的")
     ap.add_argument("--inbox", help="入口目录名；不填就从写入规则里认，再认不出来按常见名字找")
-    ap.add_argument("--profile", choices=["v0", "full"], default="full",
-                    help="v0 只看一场对话该交付的东西；full 看完整库")
+    ap.add_argument("--profile", choices=["base", "use", "v0", "full"], default="full",
+                    help="base 只看基座契约；use 看有没有真用上；v0 看一场对话该交付的东西；full 看完整库")
     args = ap.parse_args()
     root = os.path.abspath(args.root)
     if not os.path.isdir(root):
@@ -86,6 +100,8 @@ def main():
         return 2
 
     docs, dirs = walk(root)
+    base = load_base(root)
+    roles = (base or {}).get("roles") or {}
     top = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d)) and d not in SKIP_DIRS]
     empty = []
     for d in dirs:
@@ -105,7 +121,7 @@ def main():
     add("说明书 README", bool(readme), f"{len(readme)} 份" if readme else "没有",
         "在根目录写一份 README：这个库干什么、每个区放什么", 9)
 
-    inbox = args.inbox
+    inbox = args.inbox or roles.get("inbox")
     if inbox and not os.path.isdir(os.path.join(root, inbox)):
         inbox = None
     if not inbox:
@@ -136,9 +152,11 @@ def main():
     add("身份文件", identity > 0, f"{identity} 份",
         "写一份身份文件，AI 开工前先读", 4)
 
-    plan = count(docs, "plan_30d") or len([d for d in docs if "30天" in os.path.basename(d["path"]) or "30 天" in os.path.basename(d["path"])])
-    add("30天计划", plan > 0, f"{plan} 份",
-        "写第一周/第二周/第三四周怎么用起来", 9)
+    plan = count(docs, "plan_adoption") or count(docs, "plan_30d") or len(
+        [d for d in docs if "采用计划" in os.path.basename(d["path"])
+         or "30天" in os.path.basename(d["path"])])
+    add("采用计划", plan > 0, f"{plan} 份",
+        "按跑的次数写：第一次、之后每次、每 3 次看什么；不按天数", 9)
 
     projects = [d for d in docs if d["type"] == "project_status"]
     no_next = [d for d in projects if not d["fields"].get("next_action")]
@@ -161,6 +179,136 @@ def main():
     add("建库进度", bs > 0, f"{bs} 份",
         "写一份进度文件：走到哪、定了什么、下次从哪开始", 0)
 
+    # ---- 基座契约 ----
+    if base is None:
+        add("基座契约", False, "没有 .kb-base.json",
+            "用 templates/kb-base.json 生成，填角色目录、基座版本和已装模块", 3)
+    elif base.get("_error"):
+        add("基座契约", False, "文件在，但 JSON 读不了",
+            "修好 JSON；读不了就不要覆盖", 3)
+    else:
+        base_roles = base.get("roles") or {}
+        lack = [k for k in ("inbox", "projects", "knowledge", "me", "archive")
+                if not base_roles.get(k)]
+        contract = base.get("contract", "缺")
+        leftover = "{{" in read_md(os.path.join(root, BASE_FILE))
+        agent_cfg = base.get("agent") or {}
+        rules_file = agent_cfg.get("rules") or "AGENTS.md"
+        has_rules = os.path.isfile(os.path.join(root, rules_file))
+        ok = (not lack and contract == SUPPORTED_CONTRACT and not leftover
+              and bool(agent_cfg.get("primary")) and has_rules)
+        detail = f"v{base.get('version', '?')} / 契约 {contract}"
+        if agent_cfg.get("primary"):
+            detail += f" / {agent_cfg.get('primary')}"
+        if lack:
+            detail += "；缺角色 " + "、".join(lack)
+        if leftover:
+            detail += "；占位符未替换"
+        if not agent_cfg.get("primary"):
+            detail += "；缺 agent 配置"
+        if not has_rules:
+            detail += f"；缺 {rules_file}"
+        add("基座契约", ok, detail,
+            f"替换 roles 里的占位符、补 contract；本脚本支持契约 {SUPPORTED_CONTRACT}", 3)
+
+    if not roles:
+        add("角色目录", True, "没有基座契约，跳过", "", 2)
+    else:
+        lack_dirs = [f"{k}={v}" for k, v in roles.items()
+                     if v and not os.path.isdir(os.path.join(root, v))]
+        add("角色目录", not lack_dirs,
+            "、".join(lack_dirs) if lack_dirs else f"{len(roles)} 个角色目录都在",
+            "按 .kb-base.json 的映射把缺的目录建出来；不建就先改映射", 2)
+
+    rules_names = ("AGENTS.md", "CLAUDE.md", "AI协作规则.md")
+    agent_rules = [d for d in docs
+                   if os.path.basename(d["path"]) in rules_names
+                   and os.path.dirname(os.path.relpath(d["path"], root)) in ("", ".")]
+    has_order = any("启动顺序" in d["text"] for d in agent_rules)
+    has_import = any("@AGENTS.md" in d["text"] for d in agent_rules)
+    rules_clean = all("{{" not in d["text"] for d in agent_rules)
+    detail = "、".join(os.path.basename(d["path"]) for d in agent_rules) or "没有"
+    if agent_rules and not rules_clean:
+        detail += "；占位符未替换"
+    add("AI 协作规则", bool(agent_rules) and (has_order or has_import) and rules_clean,
+        detail,
+        "用 templates/AGENTS.md 写规则正文；Claude Code 再加一个 CLAUDE.md 入口", 9)
+
+    loop_doc = [d for d in docs
+                if d.get("type") == "work_loop" or os.path.basename(d["path"]) == "工作回路.md"]
+    loop_ok = bool(loop_doc) and "{{" not in loop_doc[0]["text"]
+    add("工作回路", loop_ok, "有" if loop_ok else ("没填完" if loop_doc else "没有"),
+        "写一条真实工作回路：触发 / 读什么 / 产出什么 / 写回什么", 9)
+
+    adopt = [d for d in docs
+             if d.get("type") == "adoption_log" or os.path.basename(d["path"]) == "采用记录.md"]
+    rows = 0
+    if adopt:
+        for line in adopt[0]["text"].splitlines():
+            cell = line.strip()
+            if not cell.startswith("|") or "---" in cell or "日期" in cell:
+                continue
+            first = cell.strip("|").split("|")[0].strip()
+            if first:
+                rows += 1
+    add("采用记录", bool(adopt) and rows > 0,
+        f"{rows} 次" if adopt else "没有",
+        "每跑一次回路记一行；空表不算用上", 9)
+
+    # 私人来源（可选）
+    private_cfg = (base or {}).get("private_sources") or []
+    private_dir = os.path.join(root, "私人来源")
+    if private_cfg or os.path.isdir(private_dir):
+        consent = [d for d in docs if d.get("type") == "private_sources"
+                   or os.path.basename(d["path"]) == "私人来源清单.md"]
+        knowledge_dir = os.path.abspath(os.path.join(root, roles.get("knowledge", "03-Knowledge")))
+        inside = os.path.abspath(private_dir).startswith(knowledge_dir + os.sep)
+        detail = f"{len(consent)} 份同意记录" if consent else "没有同意记录"
+        if inside:
+            detail += "；私人来源在知识层里"
+        add("私人来源", bool(consent) and not inside, detail,
+            "补 私人来源清单.md；原文移出知识层，只留候选判断", 9)
+    else:
+        add("私人来源", True, "未接", "", 9)
+
+    installed = []
+    for m in (base or {}).get("modules") or []:
+        installed.append(m.get("name") if isinstance(m, dict) else m)
+    installed = [m for m in installed if m]
+    if not installed:
+        add("模块安装", True, "还没装模块", "", 8)
+    else:
+        mode = ((base or {}).get("agent") or {}).get("modules_mode", "skills")
+        skills_dir = ((base or {}).get("agent") or {}).get("skills_dir") or ".claude/skills"
+        gone, left = [], []
+        for n in installed:
+            if mode == "checklists":
+                main = os.path.join(root, "操作模块", f"{n}.md")
+                mdir = os.path.join(root, "操作模块", n)
+            else:
+                main = os.path.join(root, skills_dir, n, "SKILL.md")
+                mdir = os.path.join(root, skills_dir, n)
+            if not os.path.isfile(main):
+                gone.append(n)
+                continue
+            for fp in [main] + [os.path.join(b, f) for b, _, fs in os.walk(mdir) for f in fs]:
+                if not fp.lower().endswith((".md", ".json", ".py", ".txt", ".yaml", ".yml")):
+                    continue
+                try:
+                    with open(fp, "r", encoding="utf-8", errors="ignore") as fh:
+                        if "{{" in fh.read():
+                            left.append(os.path.relpath(fp, root))
+                except OSError:
+                    pass
+        ok = not gone and not left
+        detail = f"{len(installed)} 个"
+        if gone:
+            detail += "；登记了但没装：" + "、".join(gone)
+        if left:
+            detail += "；还有占位符：" + "、".join(left[:3])
+        add("模块安装", ok, detail,
+            "重装缺的模块；占位符没替换等于没装", 8)
+
     junk = [d for d in top if any(k in d for k in ["其他", "杂项", "待分类", "未分类", "临时"])]
     add("没有杂物区", not junk, "、".join(junk) if junk else "干净",
         "杂物区是没想清楚的地方，先把里面的东西分掉再删", 2)
@@ -179,8 +327,17 @@ def main():
     add("没有空目录", not empty, f"{len(empty)} 个空目录" if empty else "没有",
         "空目录先删，用到再建", 2)
 
-    v0_names = {"建库进度", "分区职责表", "唯一入口", "写入规则", "说明书 README", "身份文件", "30天计划"}
-    if args.profile == "v0":
+    base_names = {"基座契约", "角色目录", "AI 协作规则", "工作回路", "唯一入口",
+                  "写入规则", "分区职责表", "说明书 README"}
+    use_names = base_names | {"采用记录", "模块安装"}
+    v0_names = base_names | {"建库进度", "身份文件", "采用计划", "采用记录"}
+    if args.profile == "base":
+        visible = [c for c in checks if c["name"] in base_names]
+        label = "基座"
+    elif args.profile == "use":
+        visible = [c for c in checks if c["name"] in use_names]
+        label = "用上"
+    elif args.profile == "v0":
         visible = [c for c in checks if c["name"] in v0_names]
         label = "第一版（一场对话）"
     else:

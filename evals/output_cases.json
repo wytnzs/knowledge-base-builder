@@ -1,0 +1,44 @@
+{
+  "description": "输出验收：五轮对话或采用诊断之后，库里应留下的文件与证据。结构由 scripts/check_kb.py 与 tests/ 检查，内容仍由人复核。",
+  "cases": [
+    {
+      "id": "build-claude-code",
+      "scenario": "从零建库，用户用 Claude Code",
+      "must_exist": [
+        "README.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".kb-base.json",
+        "写入规则.md",
+        "工作回路.md",
+        "采用记录.md"
+      ],
+      "adoption_rows_min": 1,
+      "check_profiles": ["base", "use", "v0"],
+      "must_show_in_reply": ["第一条回路", "产出", "写回"]
+    },
+    {
+      "id": "build-workbuddy",
+      "scenario": "从零建库，用户用 WorkBuddy 或网页版",
+      "must_exist": [
+        "AGENTS.md",
+        "开场卡.md",
+        ".kb-base.json",
+        "工作回路.md",
+        "采用记录.md",
+        "操作模块/inbox-triage.md"
+      ],
+      "adoption_rows_min": 1,
+      "check_profiles": ["base", "use"],
+      "must_show_in_reply": ["用哪个 Agent", "清单模式", "第一条回路"]
+    },
+    {
+      "id": "adopt-existing",
+      "scenario": "库已存在但没用起来",
+      "must_exist": ["工作回路.md", "采用记录.md"],
+      "adoption_rows_min": 2,
+      "check_profiles": ["use"],
+      "must_show_in_reply": ["不重建", "断点", "下一次什么时候跑"]
+    }
+  ]
+}

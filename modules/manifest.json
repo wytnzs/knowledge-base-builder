@@ -1,0 +1,143 @@
+{
+  "base": "knowledge-base-builder",
+  "contract": 2,
+  "description": "模块登记表。安装脚本按这张表认模块、角色、依赖和占位符；新增模块只改这里，不改脚本。模块正文用 SKILL.template.md，装成 skill 或清单由 Agent 决定。",
+  "modules": [
+    {
+      "name": "inbox-triage",
+      "version": "1.0.0",
+      "description": "处理入口积压，每条东西给一个去向",
+      "role": "inbox",
+      "default": true,
+      "requires": [
+        "inbox",
+        "knowledge",
+        "archive"
+      ],
+      "writes": [
+        "inbox",
+        "knowledge",
+        "archive"
+      ],
+      "placeholders": [
+        "INBOX",
+        "PROJECTS",
+        "AREAS",
+        "KNOWLEDGE",
+        "ARCHIVE"
+      ]
+    },
+    {
+      "name": "knowledge-card",
+      "version": "1.0.0",
+      "description": "把经验铸成可复用的判断卡，先候选后签署",
+      "role": "knowledge",
+      "default": true,
+      "requires": [
+        "knowledge"
+      ],
+      "writes": [
+        "knowledge"
+      ],
+      "placeholders": [
+        "KNOWLEDGE"
+      ]
+    },
+    {
+      "name": "project-ops",
+      "version": "1.0.0",
+      "description": "新建、推进、收尾项目，维护项目状态",
+      "role": "projects",
+      "default": true,
+      "requires": [
+        "projects",
+        "knowledge"
+      ],
+      "writes": [
+        "projects"
+      ],
+      "placeholders": [
+        "PROJECTS",
+        "KNOWLEDGE"
+      ]
+    },
+    {
+      "name": "kb-health",
+      "version": "1.0.0",
+      "description": "体检整个库，只修最堵的一项",
+      "role": null,
+      "default": true,
+      "requires": [
+        "inbox"
+      ],
+      "writes": [],
+      "placeholders": [
+        "ROOT",
+        "SKILL_ROOT"
+      ]
+    },
+    {
+      "name": "area-review",
+      "version": "1.0.0",
+      "description": "对长期方向做周复盘或月复盘，改回上游",
+      "role": "areas",
+      "default": true,
+      "requires": [
+        "areas"
+      ],
+      "writes": [
+        "areas",
+        "knowledge"
+      ],
+      "placeholders": [
+        "AREAS"
+      ]
+    },
+    {
+      "name": "theme-map",
+      "version": "1.0.0",
+      "description": "多张卡指向同一问题时建主题页，只综合不复述",
+      "role": "knowledge",
+      "default": false,
+      "requires": [
+        "knowledge"
+      ],
+      "writes": [
+        "knowledge"
+      ],
+      "placeholders": [
+        "KNOWLEDGE"
+      ]
+    },
+    {
+      "name": "me-update",
+      "version": "1.0.0",
+      "description": "更新身份、标准、偏好、节奏，改前先说为什么",
+      "role": "me",
+      "default": false,
+      "requires": [
+        "me"
+      ],
+      "writes": [
+        "me"
+      ],
+      "placeholders": [
+        "ME"
+      ]
+    },
+    {
+      "name": "data-warehouse",
+      "version": "1.0.0",
+      "description": "把外部表格、PDF、系统导出压成能查的结构化库",
+      "role": null,
+      "default": false,
+      "requires": [],
+      "writes": [
+        "data_root"
+      ],
+      "placeholders": [
+        "DATA_ROOT"
+      ]
+    }
+  ]
+}

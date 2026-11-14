@@ -1,0 +1,402 @@
+{
+  "ok": true,
+  "threshold": 0.34,
+  "description_concepts": [
+    "agent",
+    "build_action",
+    "knowledge_base",
+    "module",
+    "use_action"
+  ],
+  "missing_description_concepts": [],
+  "summary": {
+    "total": 30,
+    "passed": 30,
+    "false_positive": 0,
+    "false_negative": 0,
+    "pass_rate": 1.0
+  },
+  "failures": [],
+  "results": {
+    "should_trigger": [
+      {
+        "prompt": "我想建个自己的知识库，但不知道从哪下手",
+        "family": "cn_build",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我电脑里文件太乱了，想整理成一套能用的系统",
+        "family": "cn_messy_files",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "资料存了一堆，用的时候一个都找不到，怎么弄",
+        "family": "cn_cannot_find",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我搭一个知识库，我是做保险的",
+        "family": "cn_profession",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "知识库怎么建？有没有什么方法",
+        "family": "cn_method",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我的知识库建了半年，基本没用起来，怎么救",
+        "family": "cn_unused",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我建了知识库，但平时根本想不起来用",
+        "family": "cn_adoption",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "怎么让 AI 直接参与我的日常工作，不只是存资料",
+        "family": "cn_work_loop",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "agent",
+          "knowledge_base",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我用的不是 Claude Code，是 WorkBuddy，这套能用吗",
+        "family": "cn_agent",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "agent",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我想把微信收藏、截图、笔记都归到一起，以后好找",
+        "family": "cn_inbox",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "给我的工作加一套流程，每周重复的事太多了",
+        "family": "cn_pipeline",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "module",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我是律师，案子太多，想弄个库管理",
+        "family": "cn_lawyer",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "怎么让 AI 记住我的情况，不用每次重新说",
+        "family": "cn_identity",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "agent",
+          "use_action"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我给知识库打个底，以后换哪个 AI 都能接着用",
+        "family": "cn_base",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "agent",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "我这个库建好了，怎么让别的 Agent 直接上手",
+        "family": "cn_agent_rules",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.6,
+        "matched_concepts": [
+          "agent",
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "知识库结构要升级，别把我原来的东西弄丢",
+        "family": "cn_upgrade",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "I want to build a personal knowledge base and actually use it in my work.",
+        "family": "en_build",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      }
+    ],
+    "should_not_trigger": [
+      {
+        "prompt": "帮我整理一下 00-Inbox 里的文件",
+        "family": "inbox_existing",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.4,
+        "matched_concepts": [
+          "build_action",
+          "knowledge_base"
+        ],
+        "negative_pattern": "整理一下 00-Inbox"
+      },
+      {
+        "prompt": "把这段经验做成一张知识卡片",
+        "family": "card",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": "做成一张知识卡片"
+      },
+      {
+        "prompt": "帮我写一篇公众号文章",
+        "family": "gzh",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": "写一篇公众号"
+      },
+      {
+        "prompt": "把这篇公众号转成小红书",
+        "family": "xhs",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": "小红书"
+      },
+      {
+        "prompt": "写一条口播稿",
+        "family": "oral",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": "口播"
+      },
+      {
+        "prompt": "这个知识库里的判例怎么查",
+        "family": "case_query",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我用 Excel 建一个客户跟进表",
+        "family": "spreadsheet",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "build_action"
+        ],
+        "negative_pattern": "Excel"
+      },
+      {
+        "prompt": "帮我把这个文件夹压缩一下",
+        "family": "compress",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": "压缩"
+      },
+      {
+        "prompt": "D 盘满了怎么清理",
+        "family": "disk",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "写个 Python 统计一下文件数量",
+        "family": "script",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": "Python 统计"
+      }
+    ],
+    "near_neighbor": [
+      {
+        "prompt": "帮我把 Obsidian 库同步一下",
+        "family": "sync",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "推荐几个好用的笔记软件",
+        "family": "tool_recommend",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我把这个文件夹按类型重命名",
+        "family": "rename",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.2,
+        "matched_concepts": [
+          "knowledge_base"
+        ],
+        "negative_pattern": "文件夹"
+      }
+    ]
+  }
+}

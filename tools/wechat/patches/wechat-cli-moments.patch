@@ -1,0 +1,304 @@
+diff --git a/wechat_cli/commands/moments.py b/wechat_cli/commands/moments.py
+new file mode 100644
+index 0000000..e8796c7
+--- /dev/null
++++ b/wechat_cli/commands/moments.py
+@@ -0,0 +1,119 @@
++# -*- coding: utf-8 -*-
++"""moments 命令 — 读取本地微信朋友圈（sns.db）"""
++import json
++import os
++
++import click
++
++from ..core.contacts import get_contact_names, get_self_username
++from ..core.messages import parse_time_range
++from ..core.sns import filter_by_user, read_moments, search_moments
++from ..output.formatter import output
++
++
++def _load_moments(ctx, since, until, self_only):
++    app = ctx.obj
++    path = app.cache.get(os.path.join("sns", "sns.db"))
++    if not path:
++        raise click.ClickException(
++            "无法解密 sns/sns.db：本机没有这个库的密钥，或数据库不存在。"
++            "请先确认微信已登录，再运行 wechat-cli init。"
++        )
++    since_ts, until_ts = parse_time_range(since or "", until or "")
++    self_wxid = get_self_username(app.db_dir, app.cache, app.decrypted_dir)
++    names = get_contact_names(app.cache, app.decrypted_dir)
++    moments, stats = read_moments(
++        path,
++        self_wxid=self_wxid,
++        self_only=self_only,
++        since_ts=since_ts,
++        until_ts=until_ts,
++    )
++    return moments, names, stats
++
++
++def _emit(data, fmt, out):
++    if out:
++        with open(out, "w", encoding="utf-8") as f:
++            json.dump(data, f, ensure_ascii=False, indent=2)
++            f.write("\n")
++        output({"ok": True, "path": out, "count": data.get("meta", {}).get("count", 0)}, "json")
++        return
++    output(data, fmt)
++
++
++@click.group("moments")
++def moments():
++    """读取本地微信朋友圈（只读）"""
++
++
++@moments.command("feed")
++@click.option("--user", default="", help="按作者显示名或 wxid 过滤")
++@click.option("--since", default="", help="起始日期 YYYY-MM-DD")
++@click.option("--until", default="", help="结束日期 YYYY-MM-DD")
++@click.option("--limit", default=20, type=int, help="返回条数")
++@click.option("--self-only", is_flag=True, help="只看自己发的")
++@click.option("--format", "fmt", default="json", type=click.Choice(["json", "text"]), help="输出格式")
++@click.option("--out", default="", help="写入 JSON 文件（本地）")
++@click.pass_context
++def feed(ctx, user, since, until, limit, self_only, fmt, out):
++    """按时间线读取朋友圈
++
++    \b
++    示例:
++      wechat-cli moments feed
++      wechat-cli moments feed --user "张三" --limit 50
++      wechat-cli moments feed --since 2026-04-01 --until 2026-04-30
++      wechat-cli moments feed --self-only --format text
++    """
++    items, names, stats = _load_moments(ctx, since, until, self_only)
++    items = filter_by_user(items, names, user)
++    items = items[:max(0, limit)]
++    rows = [m.to_dict(names.get(m.username, m.username)) for m in items]
++    data = {"moments": rows, "meta": {"count": len(rows), **stats}}
++    if fmt == "text" and not out:
++        lines = []
++        for r in rows:
++            line = f"[{r['time']}] {r['author']}: {r['text']}"
++            if r["media_count"]:
++                line += f"  [{r['media_count']} 个媒体]"
++            lines.append(line)
++        output("\n\n".join(lines) if lines else "没有匹配的朋友圈", "text")
++        return
++    _emit(data, fmt, out)
++
++
++@moments.command("search")
++@click.argument("keyword")
++@click.option("--user", default="", help="限定作者")
++@click.option("--since", default="", help="起始日期 YYYY-MM-DD")
++@click.option("--until", default="", help="结束日期 YYYY-MM-DD")
++@click.option("--limit", default=20, type=int, help="返回条数")
++@click.option("--self-only", is_flag=True, help="只搜自己发的")
++@click.option("--format", "fmt", default="json", type=click.Choice(["json", "text"]), help="输出格式")
++@click.option("--out", default="", help="写入 JSON 文件（本地）")
++@click.pass_context
++def search(ctx, keyword, user, since, until, limit, self_only, fmt, out):
++    """搜索朋友圈正文
++
++    \b
++    示例:
++      wechat-cli moments search "保险"
++      wechat-cli moments search "婚礼" --user "李四" --since 2025-01-01
++    """
++    items, names, stats = _load_moments(ctx, since, until, self_only)
++    items = filter_by_user(items, names, user)
++    items = search_moments(items, keyword)
++    items = items[:max(0, limit)]
++    rows = [m.to_dict(names.get(m.username, m.username)) for m in items]
++    data = {"moments": rows, "meta": {"count": len(rows), "keyword": keyword, **stats}}
++    if fmt == "text" and not out:
++        lines = []
++        for r in rows:
++            line = f"[{r['time']}] {r['author']}: {r['text']}"
++            if r["media_count"]:
++                line += f"  [{r['media_count']} 个媒体]"
++            lines.append(line)
++        output("\n\n".join(lines) if lines else "没有匹配的朋友圈", "text")
++        return
++    _emit(data, fmt, out)
+diff --git a/wechat_cli/core/sns.py b/wechat_cli/core/sns.py
+new file mode 100644
+index 0000000..720148e
+--- /dev/null
++++ b/wechat_cli/core/sns.py
+@@ -0,0 +1,153 @@
++# -*- coding: utf-8 -*-
++"""朋友圈（SNS）读取：解析 sns.db 的 SnsTimeLine。
++
++只读：数据库由 DBCache 解密到临时文件，本模块只查询，不写回原库。
++解析逻辑参考 MIT 许可的 chatlog-plus/moments.py，按其 original notice 保留署名。
++"""
++from __future__ import annotations
++
++import sqlite3
++import xml.etree.ElementTree as ET
++from dataclasses import dataclass, field
++from datetime import datetime
++from typing import Any
++
++
++@dataclass
++class Moment:
++    id: str
++    username: str
++    created: datetime
++    text: str
++    media: list[dict[str, str]] = field(default_factory=list)
++
++    def to_dict(self, author: str = "") -> dict[str, Any]:
++        return {
++            "id": self.id,
++            "author": author or self.username,
++            "username": self.username,
++            "text": self.text,
++            "timestamp": int(self.created.timestamp()),
++            "time": self.created.strftime("%Y-%m-%d %H:%M:%S"),
++            "media": self.media,
++            "media_count": len(self.media),
++        }
++
++
++def _text_of(node: ET.Element | None) -> str:
++    if node is None:
++        return ""
++    return "".join(node.itertext()).strip()
++
++
++def parse_moment(content: str) -> Moment | None:
++    try:
++        root = ET.fromstring(content)
++    except ET.ParseError:
++        return None
++    timeline = root.find(".//TimelineObject")
++    if timeline is None:
++        return None
++    moment_id = (timeline.findtext("id") or "").strip()
++    username = (timeline.findtext("username") or "").strip()
++    try:
++        epoch = int((timeline.findtext("createTime") or "0").strip())
++    except ValueError:
++        epoch = 0
++    if not moment_id or epoch <= 0:
++        return None
++    text = (timeline.findtext("contentDesc") or "").strip()
++    if not text:
++        content_object = timeline.find(".//ContentObject")
++        if content_object is not None:
++            text = _text_of(content_object.find("title")) or _text_of(content_object.find("description"))
++    media: list[dict[str, str]] = []
++    for item in timeline.findall(".//mediaList/media"):
++        url = (item.findtext("url") or "").strip()
++        thumb = ""
++        thumb_node = item.find("thumb")
++        if thumb_node is not None:
++            thumb = (thumb_node.text or "").strip()
++        if url or thumb:
++            media.append({
++                "type": (item.findtext("type") or "").strip(),
++                "url": url,
++                "thumb": thumb,
++            })
++    return Moment(
++        id=moment_id,
++        username=username,
++        created=datetime.fromtimestamp(epoch),
++        text=text,
++        media=media,
++    )
++
++
++def read_moments(
++    db_path: str,
++    *,
++    self_wxid: str = "",
++    self_only: bool = False,
++    since_ts: int | None = None,
++    until_ts: int | None = None,
++) -> tuple[list[Moment], dict[str, int]]:
++    stats = {"rows": 0, "parsed": 0, "failed": 0, "dup": 0, "filtered": 0}
++    result: list[Moment] = []
++    seen: set[str] = set()
++    connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
++    try:
++        rows = connection.execute("select user_name, content from SnsTimeLine").fetchall()
++        stats["rows"] = len(rows)
++        for _username, content in rows:
++            if isinstance(content, bytes):
++                try:
++                    content = content.decode("utf-8", errors="ignore")
++                except Exception:
++                    stats["failed"] += 1
++                    continue
++            if not isinstance(content, str):
++                stats["failed"] += 1
++                continue
++            moment = parse_moment(content)
++            if moment is None:
++                stats["failed"] += 1
++                continue
++            stats["parsed"] += 1
++            if moment.id in seen:
++                stats["dup"] += 1
++                continue
++            seen.add(moment.id)
++            if self_only and self_wxid and moment.username != self_wxid:
++                stats["filtered"] += 1
++                continue
++            ts = int(moment.created.timestamp())
++            if since_ts is not None and ts < since_ts:
++                stats["filtered"] += 1
++                continue
++            if until_ts is not None and ts > until_ts:
++                stats["filtered"] += 1
++                continue
++            result.append(moment)
++    finally:
++        connection.close()
++    result.sort(key=lambda item: item.created, reverse=True)
++    return result, stats
++
++
++def filter_by_user(moments: list[Moment], names: dict[str, str], query: str) -> list[Moment]:
++    q = (query or "").strip().lower()
++    if not q:
++        return moments
++    return [
++        m for m in moments
++        if q in (names.get(m.username, "") or "").lower()
++        or q in (m.username or "").lower()
++        or q in (names.get(m.username, m.username) or "").lower()
++    ]
++
++
++def search_moments(moments: list[Moment], keyword: str) -> list[Moment]:
++    q = (keyword or "").strip().lower()
++    if not q:
++        return []
++    return [m for m in moments if q in (m.text or "").lower()]
+diff --git a/wechat_cli/main.py b/wechat_cli/main.py
+index 3400c06..0657a1d 100644
+--- a/wechat_cli/main.py
++++ b/wechat_cli/main.py
+@@ -55,6 +55,7 @@ from .commands.export import export
+ from .commands.stats import stats
+ from .commands.unread import unread
+ from .commands.favorites import favorites
++from .commands.moments import moments
+ 
+ cli.add_command(init)
+ cli.add_command(sessions)
+@@ -67,6 +68,7 @@ cli.add_command(export)
+ cli.add_command(stats)
+ cli.add_command(unread)
+ cli.add_command(favorites)
++cli.add_command(moments)
+ 
+ 
+ if __name__ == "__main__":
